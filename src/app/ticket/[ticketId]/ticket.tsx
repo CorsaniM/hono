@@ -86,7 +86,7 @@ export default function TicketPage(props:{params:{ticketId: string}}) {
           <hr className='mt-3 bg-gray-800'/>
         </div>
         <div className='p-2 bg-gray-800'>
-          <CardTitle>Mensajes :</CardTitle>
+          <CardTitle>Mensajes:</CardTitle>
           <List className='flex'>
             {ticket.comments ? ticket.comments.map((comments) => (
               <ListTile
