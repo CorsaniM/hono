@@ -26,7 +26,7 @@ export default function TicketPage(props:{params:{ticketId: string}}) {
   const { organization } = useOrganization();
 
   const [description, setDescription] = useState("")
-  const [title, setTitle] = useState(ticket?.title || "")
+  const [title, setTitle] = useState(ticket?.title ?? "")
 
   console.log(title, "Titulo")
 
@@ -43,7 +43,7 @@ export default function TicketPage(props:{params:{ticketId: string}}) {
         })  
          
         toast.success('mensaje enviado')
-        router.invalidateQueries()
+        await router.invalidateQueries()
         setDescription("")
 
     } catch (e) {
@@ -69,17 +69,17 @@ export default function TicketPage(props:{params:{ticketId: string}}) {
         <div className='bg-gray-800 p-2'>
           <div className='flex flex-row bg-gray-800 '>
             <div>
-            <CardTitle>ID: {ticket!.id} - {ticket!.title}</CardTitle>
-            Fecha de creación: {dayjs.utc(ticket.createdAt).format('DD/MM/YYYY')}
+            <CardTitle>ID: {ticket.id ?? ""} - {ticket.title ?? ""}</CardTitle>
+            Fecha de creación: {dayjs.utc(ticket.createdAt).format('DD/MM/YYYY') ?? ""}
             </div>
             <div className='flex-auto px-16 bg-gray-800'>
-            Estado: {ticket!.state} <br />
-            Urgencia: {ticket!.urgency}
+            Estado: {ticket.state ?? ""} <br />
+            Urgencia: {ticket.urgency ?? ""}
             </div>
           </div>
 
             <br />
-            Description: {ticket!.description}
+            Description: {ticket.description ?? ""}
             {ticket.images ? (null) : (
               <h1>No contiene images</h1>
             )}
