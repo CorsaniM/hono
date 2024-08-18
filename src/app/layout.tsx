@@ -1,7 +1,7 @@
 import "~/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { TRPCReactProvider } from "~/trpc/react";
-import { ClerkProvider, useUser} from '@clerk/nextjs'
+import { ClerkProvider } from "@clerk/nextjs";
 import { SyncActiveOrganization } from "./_components/SyncActiveOrganization";
 import { auth } from "@clerk/nextjs/server";
 import Upbar from "./_components/upbar";
@@ -19,32 +19,27 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-
   const { sessionClaims } = auth();
 
-  
-  
   return (
     <ClerkProvider signInFallbackRedirectUrl={"/"}>
-      <SyncActiveOrganization membership={sessionClaims!.membership!}/>
-    <html lang="en" className={`${GeistSans.variable}`}>
-      <body className="bg-gray-600 h-screen text-gray-200">
-        <div className="fixed top h-16 ">
-          <Upbar/>
-        </div>
-        <div className='list-none w-36 fixed top-16 bottom-0 left-0 flex-col
-        shadow-2xl bg-gray-800 sm:flex h-full'>
-          <Sidebar/>
-        </div>
-          <div className='flex '>
+      <SyncActiveOrganization membership={sessionClaims?.membership} />
+      <html lang="en" className={`${GeistSans.variable}`}>
+        <body className="bg-gray-600 h-screen text-gray-200">
+          <div className="fixed top h-16 ">
+            <Upbar />
+          </div>
+          <div className="list-none w-36 fixed top-16 bottom-0 left-0 flex-col shadow-2xl bg-gray-800 sm:flex h-full">
+            <Sidebar />
+          </div>
+          <div className="flex">
             <TRPCReactProvider>
               {children}
               <Toaster />
             </TRPCReactProvider>
           </div>
-      </body>
-    </html>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
-
