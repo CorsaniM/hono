@@ -3,8 +3,13 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { useMutation } from "@tanstack/react-query"
+import { api } from "~/trpc/react"
 
 export default function CrearTicket() {
+
+    const { mutateAsync: CrearTicket, isPending } = api.tickets.create.useMutation();
+
     const [description, setDescription] = useState("")
     const [motivo, setMotivo] = useState("")
     const [organization, setOrganization] = useState("dimetallo")
@@ -14,25 +19,28 @@ export default function CrearTicket() {
 
     async function handleCreate() {
         try {
-            const response = await fetch('http://localhost:3000/api/hono/dimetallo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    orgId: organization,
-                    state: "pendiente",
-                    urgency: urgencia,
-                    suppUrgency: 0,
-                    title: motivo,
-                    description: description,
-                }),
-            });
+            
+
+
+            const baseUrl = "http://localhost:3000/api/hono/ticket/get"; 
+            const url = `${baseUrl}/${encodeURIComponent(organization)}/${urgencia}/${encodeURIComponent(motivo)}/${encodeURIComponent(description)}`;
+
+
+            const response = await fetch(url);
+            // const data = await response.json();
 
             if (!response.ok) {
                 throw new Error('Error en la creación del ticket');
             }
 
+            await CrearTicket({
+                orgId: organization ?? "",
+                state: "pendiente",
+                urgency: urgencia ?? "",
+                suppUrgency: 0,
+                title: motivo ?? "",
+                description: description ?? "" 
+            })
             // const data = await response.json();
             toast.success('Ticket creado correctamente');
             router.refresh();
@@ -41,6 +49,29 @@ export default function CrearTicket() {
             toast.error('No se pudo crear el ticket');
         }
     }
+
+
+
+
+
+//     const baseUrl = "http://localhost:3000/api/hono/ticket/get"; // Cambia localhost a la URL de tu servidor si es necesario
+//     const url = `${baseUrl}/${encodeURIComponent(orgId)}/${urgency}/${encodeURIComponent(title)}/${encodeURIComponent(description)}`;
+  
+//     try {
+//       // Realizar la solicitud GET a la URL construida
+//       const response = await fetch(url);
+//       const data = await response.json();
+      
+//       if (response.ok) {
+//         console.log('Ticket creado con éxito:', data);
+//       } else {
+//         console.error('Error al crear el ticket:', data.error);
+//       }
+//     } catch (error) {
+//       console.error('Error al realizar la solicitud:', error);
+//     }
+//   }
+
 
     return (
         <div className="flex flex-col m-4">
