@@ -6,40 +6,20 @@ import { db } from "~/server/db";
 import { tickets } from "~/server/db/schema";
 
 const app = new Hono().basePath("api/hono");
-// const TicketSchema = z.object({
-//   orgId: z.string(),
-//   state: z.string(),
-//   urgency: z.number(),
-//   suppUrgency: z.number().optional(),
-//   title: z.string(),
-//   description: z.string(),
-// });
 
-// // Infiriendo el tipo a partir del esquema
-// type TicketType = z.infer<typeof TicketSchema>;
+app.get("/ticket/:id", async (c) => {
+  const ticketId = c.req.param("id");
 
-// app.post("/api/hono/dimetallo", async (c) => {
-//   // Asignando el tipo directamente desde TicketSchema
-//   const body: TicketType = TicketSchema.parse(await c.req.json());
-
-//   const { orgId, state, urgency, title, description } = body;
-
-//   const newTicket = await db
-//     .insert(tickets)
-//     .values({
-//       orgId,
-//       state,
-//       urgency,
-//       title,
-//       description,
-//     })
-//     .returning();
-
-//   return c.json({ success: true, data: newTicket });
-// });
+  const ticket = await api.tickets.getById({ id: parseInt(ticketId) });
+  if (ticket) {
+    return c.json(ticket);
+  } else {
+    return c.json("no existe el ticket " + ticketId);
+  }
+});
 
 // app.post("/api/hono/dimetallo", async (c) => {
-//   // const body = await c.req.json();
+//   const body = await c.req.json();
 
 //   const TicketSchema = z.object({
 //     orgId: z.string(),
@@ -50,14 +30,13 @@ const app = new Hono().basePath("api/hono");
 //     description: z.string(),
 //   });
 
-//   // const validation = TicketSchema.safeParse(body);
+//   const validation = TicketSchema.safeParse(body);
 
 //   if (!validation.success) {
 //     return c.json({ error: "Invalid data" }, 400);
 //   }
 
-//   const { orgId, state, urgency, suppUrgency, title, description } =
-//     validation.data;
+//   const { orgId, state, urgency, title, description } = validation.data;
 
 //   const newTicket = await db
 //     .insert(tickets)
@@ -65,7 +44,6 @@ const app = new Hono().basePath("api/hono");
 //       orgId,
 //       state,
 //       urgency,
-//       suppUrgency: suppUrgency || 0,
 //       title,
 //       description,
 //     })
@@ -74,60 +52,55 @@ const app = new Hono().basePath("api/hono");
 //   return c.json({ success: true, data: newTicket });
 // });
 
-// app.get("/ticket/get/:orgid/:urgency/:title/:description", async (c) => {
-//   const orgId = c.req.param("orgid");
-//   const urgency = parseInt(c.req.param("urgency"));
-//   const title = c.req.param("title");
-//   const description = c.req.param("description");
+app.get("/ticket/get/:orgid/:urgency/:title/:description", async (c) => {
+  const orgId = c.req.param("orgid");
+  const urgency = parseInt(c.req.param("urgency"));
+  const title = c.req.param("title");
+  const description = c.req.param("description");
 
-//   if (!orgId || !title || !description) {
-//     return c.json({ error: "Faltan parámetros requeridos" }, 400);
-//   }
+  if (!orgId || !title || !description) {
+    return c.json({ error: "Faltan parámetros requeridos" }, 400);
+  }
 
-//   try {
-//     const newTicket = await api.tickets.create({
-//       orgId,
-//       state: "nuevo",
-//       urgency,
-//       suppUrgency: 0,
-//       title,
-//       description,
-//     });
-//     return c.json("Ticket creado");
-//   } catch (error) {
-//     return c.json({ error: "Error creando el ticket" }, 500);
-//   }
-// });
+  try {
+    const newTicket = await api.tickets.create({
+      orgId,
+      state: "nuevo",
+      urgency,
+      suppUrgency: 0,
+      title,
+      description,
+    });
+    return c.json("Ticket creado");
+  } catch (error) {
+    return c.json({ error: "Error creando el ticket" }, 500);
+  }
+});
 
-// app.get("/comments/get/:ticketId/:title/:description", async (c) => {
-//   const ticketId = c.req.param("ticketId");
-//   const title = c.req.param("title");
-//   const description = c.req.param("description");
+app.get("/comments/get/:ticketId/:title/:description", async (c) => {
+  const ticketId = c.req.param("ticketId");
+  const title = c.req.param("title");
+  const description = c.req.param("description");
 
-//   if (!ticketId || !title || !description) {
-//     return c.json({ error: "Faltan parámetros requeridos" }, 400);
-//   }
+  if (!ticketId || !title || !description) {
+    return c.json({ error: "Faltan parámetros requeridos" }, 400);
+  }
 
-//   try {
-//     const newTicket = await api.comments.create({
-//       state: "no leido",
-//       title: title,
-//       description: description,
-//       createdAt: new Date(),
-//       userId: "",
-//       ticketId: parseInt(ticketId),
-//       type: "recibido",
-//     });
-//     return c.json("Comentario creado en Ticket " + ticketId + " id"); // Devuelve el ticket creado con un código 201
-//   } catch (error) {
-//     return c.json({ error: "Error creando el comentario" }, 500);
-//   }
-// });
-
-// postDimetallo.post("/comments/post", async (c) => {
-//   const { id, title, description } = await c.req.json();
-//   return c.json("Comentario creado");
-// });
+  try {
+    const newTicket = await api.comments.create({
+      state: "no leido",
+      title: title,
+      description: description,
+      createdAt: new Date(),
+      userId: "",
+      ticketId: parseInt(ticketId),
+      type: "recibido",
+    });
+    return c.json("Comentario creado en Ticket " + ticketId + " id"); // Devuelve el ticket creado con un código 201
+  } catch (error) {
+    return c.json({ error: "Error creando el comentario" }, 500);
+  }
+});
 
 app.notFound((c) => {
   return c.text("Custom 404 Message", 404);
