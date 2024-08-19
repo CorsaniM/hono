@@ -6,19 +6,36 @@ import { db } from "~/server/db";
 import { tickets } from "~/server/db/schema";
 
 const app = new Hono().basePath("api/hono");
-// const postDimetallo = new Hono().basePath(
-//   "/hono-git-involve-hono-proyect.vercel.app/api/hono",
-// );
+const TicketSchema = z.object({
+  orgId: z.string(),
+  state: z.string(),
+  urgency: z.number(),
+  suppUrgency: z.number().optional(),
+  title: z.string(),
+  description: z.string(),
+});
 
-app.get("/ticket/:id", async (c) => {
-  const ticketId = c.req.param("id");
+// Infiriendo el tipo a partir del esquema
+type TicketType = z.infer<typeof TicketSchema>;
 
-  const ticket = await api.tickets.getById({ id: parseInt(ticketId) });
-  if (ticket) {
-    return c.json(ticket);
-  } else {
-    return c.json("no existe el ticket " + ticketId);
-  }
+app.post("/api/hono/dimetallo", async (c) => {
+  // Asignando el tipo directamente desde TicketSchema
+  const body: TicketType = TicketSchema.parse(await c.req.json());
+
+  const { orgId, state, urgency, title, description } = body;
+
+  const newTicket = await db
+    .insert(tickets)
+    .values({
+      orgId,
+      state,
+      urgency,
+      title,
+      description,
+    })
+    .returning();
+
+  return c.json({ success: true, data: newTicket });
 });
 
 // app.post("/api/hono/dimetallo", async (c) => {
