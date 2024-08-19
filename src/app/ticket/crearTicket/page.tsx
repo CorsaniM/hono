@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { useMutation } from "@tanstack/react-query"
 import { api } from "~/trpc/react"
+import LayoutContainer from "~/app/_components/layout-container"
 
 export default function CrearTicket() {
 
@@ -52,28 +52,9 @@ export default function CrearTicket() {
 
 
 
-
-
-//     const baseUrl = "http://localhost:3000/api/hono/ticket/get"; // Cambia localhost a la URL de tu servidor si es necesario
-//     const url = `${baseUrl}/${encodeURIComponent(orgId)}/${urgency}/${encodeURIComponent(title)}/${encodeURIComponent(description)}`;
-  
-//     try {
-//       // Realizar la solicitud GET a la URL construida
-//       const response = await fetch(url);
-//       const data = await response.json();
-      
-//       if (response.ok) {
-//         console.log('Ticket creado con éxito:', data);
-//       } else {
-//         console.error('Error al crear el ticket:', data.error);
-//       }
-//     } catch (error) {
-//       console.error('Error al realizar la solicitud:', error);
-//     }
-//   }
-
-
     return (
+        <LayoutContainer>
+
         <div className="flex flex-col m-4">
             <div className="h-1/5 flex flex-col m-2">
                 <div className="flex flex-row gap-6">
@@ -116,5 +97,7 @@ export default function CrearTicket() {
                 Crear ticket
             </button>
         </div>
+        </LayoutContainer>
+
     )
 }

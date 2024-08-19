@@ -42,7 +42,7 @@ export default function Page() {
         </div>
       </div>
       <div>
-        <Link href={`/crearTicket`}>
+        <Link href={`/ticket/crearTicket`}>
           Crear ticket
         </Link>
       </div>
