@@ -14,16 +14,7 @@ export default function Page() {
   const ticketsPorOrg = api.tickets.getByOrg.useQuery({ orgId: "dimetallo" }).data;
 
   const { mutateAsync: CreateTicket } = api.tickets.create.useMutation()
-  async function Creator() {
-    await CreateTicket({
-      orgId: "dimetallo",
-      state: "",
-      urgency: 0,
-      suppUrgency: 0,
-      title: "title",
-      description: ""
-    })
-  }
+
 
   return (
     <div className="h-screen w-screen ml-36 mt-16 grid grid-rows-8">
@@ -51,9 +42,9 @@ export default function Page() {
         </div>
       </div>
       <div>
-        <Button onClick={Creator}>
+        <Link href={`/crearTicket`}>
           Crear ticket
-        </Button>
+        </Link>
       </div>
     </div>
   )

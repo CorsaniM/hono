@@ -1,6 +1,10 @@
 "use server";
-import { Hono } from "hono";
+
 import { api } from "~/trpc/server";
+import { Hono } from "hono";
+import { z } from "zod";
+import { db } from "~/server/db";
+import { tickets } from "~/server/db/schema";
 
 const app = new Hono().basePath("api/hono");
 const postDimetallo = new Hono().basePath("api/hono/dimetallo");
@@ -65,6 +69,44 @@ app.get("/comments/get/:ticketId/:title/:description", async (c) => {
     return c.json({ error: "Error creando el comentario" }, 500);
   }
 });
+
+postDimetallo.post("/api/hono/dimetallo", async (c) => {
+  const body = await c.req.json();
+
+  const TicketSchema = z.object({
+    orgId: z.string(),
+    state: z.string(),
+    urgency: z.number(),
+    suppUrgency: z.number().optional(),
+    title: z.string(),
+    description: z.string(),
+  });
+
+  const validation = TicketSchema.safeParse(body);
+
+  if (!validation.success) {
+    return c.json({ error: "Invalid data" }, 400);
+  }
+
+  const { orgId, state, urgency, suppUrgency, title, description } =
+    validation.data;
+
+  const newTicket = await db
+    .insert(tickets)
+    .values({
+      orgId,
+      state,
+      urgency,
+      suppUrgency: suppUrgency || 0,
+      title,
+      description,
+    })
+    .returning();
+
+  return c.json({ success: true, data: newTicket });
+});
+
+export default app;
 
 postDimetallo.post("/comments/post", async (c) => {
   // const { id, title, description } = await c.req.json();

@@ -23,7 +23,7 @@ export default function TicketPage(props:{params:{ticketId: string}}) {
   const router = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
-  const { organization } = useOrganization();
+  // const { organization } = useOrganization();
 
   const [description, setDescription] = useState("")
   const [title, setTitle] = useState(ticket?.title ?? "")
