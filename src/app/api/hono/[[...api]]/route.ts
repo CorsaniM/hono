@@ -1,14 +1,14 @@
 "use server";
 
-import { api } from "~/trpc/server";
 import { Hono } from "hono";
 import { z } from "zod";
 import { db } from "~/server/db";
 import { tickets } from "~/server/db/schema";
+import { api } from "~/trpc/server";
 
-const app = new Hono().basePath("api/hono");
-const postDimetallo = new Hono().basePath("api/hono/dimetallo");
+const app = new Hono().basePath("/api/hono");
 
+// Ruta para obtener un ticket por ID
 app.get("/ticket/:id", async (c) => {
   const ticketId = c.req.param("id");
 
@@ -16,10 +16,11 @@ app.get("/ticket/:id", async (c) => {
   if (ticket) {
     return c.json(ticket);
   } else {
-    return c.json("no existe el ticket " + ticketId);
+    return c.json("No existe el ticket " + ticketId);
   }
 });
 
+// Ruta para crear un ticket
 app.get("/ticket/get/:orgid/:urgency/:title/:description", async (c) => {
   const orgId = c.req.param("orgid");
   const urgency = parseInt(c.req.param("urgency"));
@@ -33,9 +34,9 @@ app.get("/ticket/get/:orgid/:urgency/:title/:description", async (c) => {
   try {
     const newTicket = await api.tickets.create({
       orgId,
-      state: "nuevo", // Asignar el estado por defecto
+      state: "nuevo",
       urgency,
-      suppUrgency: 0, // Asignar suppUrgency por defecto a 0
+      suppUrgency: 0,
       title,
       description,
     });
@@ -45,6 +46,7 @@ app.get("/ticket/get/:orgid/:urgency/:title/:description", async (c) => {
   }
 });
 
+// Ruta para crear un comentario en un ticket
 app.get("/comments/get/:ticketId/:title/:description", async (c) => {
   const ticketId = c.req.param("ticketId");
   const title = c.req.param("title");
@@ -64,13 +66,14 @@ app.get("/comments/get/:ticketId/:title/:description", async (c) => {
       ticketId: parseInt(ticketId),
       type: "recibido",
     });
-    return c.json("Comentario creado en Ticket " + ticketId + newTicket); // Devuelve el ticket creado con un código 201
+    return c.json("Comentario creado en Ticket " + ticketId + newTicket);
   } catch (error) {
     return c.json({ error: "Error creando el comentario" }, 500);
   }
 });
 
-postDimetallo.post("/api/hono/dimetallo", async (c) => {
+// Ruta POST para crear un ticket a través de JSON
+app.post("/dimetallo", async (c) => {
   const body = await c.req.json();
 
   const TicketSchema = z.object({
@@ -106,13 +109,12 @@ postDimetallo.post("/api/hono/dimetallo", async (c) => {
   return c.json({ success: true, data: newTicket });
 });
 
-export default app;
-
-postDimetallo.post("/comments/post", async (c) => {
-  // const { id, title, description } = await c.req.json();
+// Ruta POST para crear un comentario (no tiene lógica, solo es un ejemplo)
+app.post("/comments/post", async (c) => {
   return c.json("Comentario creado");
 });
 
+// Manejo de rutas no encontradas
 app.notFound((c) => {
   return c.text("Custom 404 Message", 404);
 });
@@ -123,8 +125,3 @@ export const POST = async (request: Request) => app.fetch(request);
 export const PUT = async (request: Request) => app.fetch(request);
 export const DELETE = async (request: Request) => app.fetch(request);
 export const PATCH = async (request: Request) => app.fetch(request);
-
-// TEST creación de ticket:
-// http://localhost:3000/api/hono/ticket/post/dimetallo/2/Test%20Ticket/This%20is%20a%20test%20description
-// TEST envío de coment: (funciona)
-// http://localhost:3000/api/hono/comments/get/5/ExampleTitle/ExampleDescription
