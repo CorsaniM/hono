@@ -82,30 +82,30 @@ app.get("/ticket/:id", async (c) => {
 //   }
 // });
 
-app.get("/comments/get/:ticketId/:title/:description", async (c) => {
-  const ticketId = c.req.param("ticketId");
-  const title = c.req.param("title");
-  const description = c.req.param("description");
+// app.get("/comments/get/:ticketId/:title/:description", async (c) => {
+//   const ticketId = c.req.param("ticketId");
+//   const title = c.req.param("title");
+//   const description = c.req.param("description");
 
-  if (!ticketId || !title || !description) {
-    return c.json({ error: "Faltan parámetros requeridos" }, 400);
-  }
+//   if (!ticketId || !title || !description) {
+//     return c.json({ error: "Faltan parámetros requeridos" }, 400);
+//   }
 
-  try {
-    const newTicket = await api.comments.create({
-      state: "no leido",
-      title: title,
-      description: description,
-      createdAt: new Date(),
-      userId: "",
-      ticketId: parseInt(ticketId),
-      type: "recibido",
-    });
-    return c.json("Comentario creado en Ticket " + ticketId + " id"); // Devuelve el ticket creado con un código 201
-  } catch (error) {
-    return c.json({ error: "Error creando el comentario" }, 500);
-  }
-});
+//   try {
+//     const newTicket = await api.comments.create({
+//       state: "no leido",
+//       title: title,
+//       description: description,
+//       createdAt: new Date(),
+//       userId: "",
+//       ticketId: parseInt(ticketId),
+//       type: "recibido",
+//     });
+//     return c.json("Comentario creado en Ticket " + ticketId + " id"); // Devuelve el ticket creado con un código 201
+//   } catch (error) {
+//     return c.json({ error: "Error creando el comentario" }, 500);
+//   }
+// });
 
 // postDimetallo.post("/comments/post", async (c) => {
 //   const { id, title, description } = await c.req.json();
