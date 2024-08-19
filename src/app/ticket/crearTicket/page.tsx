@@ -33,7 +33,7 @@ export default function CrearTicket() {
                 throw new Error('Error en la creación del ticket');
             }
 
-            const data = await response.json();
+            // const data = await response.json();
             toast.success('Ticket creado correctamente');
             router.refresh();
         } catch (e) {

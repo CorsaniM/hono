@@ -8,6 +8,15 @@ import { api } from "~/trpc/server";
 
 const app = new Hono().basePath("/api/hono");
 
+const TicketSchema = z.object({
+  orgId: z.string(),
+  state: z.string(),
+  urgency: z.number(),
+  suppUrgency: z.number().optional(),
+  title: z.string(),
+  description: z.string(),
+});
+type TicketType = z.infer<typeof TicketSchema>;
 // Ruta para obtener un ticket por ID
 app.get("/ticket/:id", async (c) => {
   const ticketId = c.req.param("id");
@@ -73,17 +82,8 @@ app.get("/comments/get/:ticketId/:title/:description", async (c) => {
 });
 
 // Ruta POST para crear un ticket a través de JSON
-app.post("/dimetallo", async (c) => {
-  const body = await c.req.json();
-
-  const TicketSchema = z.object({
-    orgId: z.string(),
-    state: z.string(),
-    urgency: z.number(),
-    suppUrgency: z.number().optional(),
-    title: z.string(),
-    description: z.string(),
-  });
+app.post("/api/hono/dimetallo", async (c) => {
+  const body: TicketType = TicketSchema.parse(await c.req.json());
 
   const validation = TicketSchema.safeParse(body);
 
@@ -91,8 +91,7 @@ app.post("/dimetallo", async (c) => {
     return c.json({ error: "Invalid data" }, 400);
   }
 
-  const { orgId, state, urgency, suppUrgency, title, description } =
-    validation.data;
+  const { orgId, state, urgency, title, description } = validation.data;
 
   const newTicket = await db
     .insert(tickets)
@@ -100,7 +99,6 @@ app.post("/dimetallo", async (c) => {
       orgId,
       state,
       urgency,
-      suppUrgency: suppUrgency || 0,
       title,
       description,
     })
