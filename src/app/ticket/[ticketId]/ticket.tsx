@@ -94,7 +94,7 @@ export default function TicketPage(props:{params:{ticketId: string}}) {
               title={comments.title}
               leading={comments.description}
               />
-            )) : (<h1>No hay notificaciones</h1>)}
+            )) : (<h1>No hay notificaciones :(</h1>)}
           </List>
         </div>
         <h1>Titulo</h1>
